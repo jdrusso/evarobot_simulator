@@ -75,7 +75,7 @@ namespace gazebo
 	  {
 		  if(!bumpers[i])
 			printf("bumper %d is NULL\n", i);
-		  this->contactsensors[i] = boost::dynamic_pointer_cast<sensors::ContactSensor>(bumpers[i]);
+		  this->contactsensors[i] = std::dynamic_pointer_cast<sensors::ContactSensor>(bumpers[i]);
           if(!this->contactsensors[i])
 			printf("contactsensor %d is NULL\n", i);
 	  }
@@ -121,7 +121,7 @@ namespace gazebo
 				
 				unsigned int collCount;// = this->contactsensors[i]->GetCollisionContactCount(this->contactsensors[i]->GetCollisionName(this->contactsensors[i]->GetCollisionCount()));
 				
-				contact_bilgisi = this->contactsensors[i]->GetContacts();
+				contact_bilgisi = this->contactsensors[i]->Contacts();
 					
 				collCount = contact_bilgisi.contact_size();
 				

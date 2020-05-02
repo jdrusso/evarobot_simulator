@@ -59,7 +59,7 @@ GazeboRosSonar::~GazeboRosSonar()
 void GazeboRosSonar::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent sensor
-  sensor_ = boost::dynamic_pointer_cast<sensors::RaySensor>(_sensor);
+  sensor_ = std::dynamic_pointer_cast<sensors::RaySensor>(_sensor);
   if (!sensor_)
   {
     gzthrow("GazeboRosSonar requires a Ray Sensor as its parent");
@@ -67,7 +67,7 @@ void GazeboRosSonar::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   }
 
   // Get the world name.
-  std::string worldName = sensor_->GetWorldName();
+  std::string worldName = sensor_->WorldName();
   world = physics::get_world(worldName);
 
   // default parameters
@@ -95,8 +95,8 @@ void GazeboRosSonar::Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf)
   range_.radiation_type = sensor_msgs::Range::ULTRASOUND;
   range_.field_of_view = d_field_of_view;
 //std::min(fabs((sensor_->GetAngleMax() - sensor_->GetAngleMin()).Radian()), fabs((sensor_->GetVerticalAngleMax() - sensor_->GetVerticalAngleMin()).Radian()));
-  range_.max_range = sensor_->GetRangeMax();
-  range_.min_range = sensor_->GetRangeMin();
+  range_.max_range = sensor_->RangeMax();
+  range_.min_range = sensor_->RangeMin();
 
   // Make sure the ROS node for Gazebo has already been initialized
   if (!ros::isInitialized())
@@ -134,21 +134,21 @@ void GazeboRosSonar::Reset()
 // Update the controller
 void GazeboRosSonar::Update()
 {
-  common::Time sim_time = world->GetSimTime();
+  common::Time sim_time = world->SimTime();
   double dt = updateTimer.getTimeSinceLastUpdate().Double();
 
   // activate RaySensor if it is not yet active
   if (!sensor_->IsActive()) sensor_->SetActive(true);
 
-  range_.header.stamp.sec  = (world->GetSimTime()).sec;
-  range_.header.stamp.nsec = (world->GetSimTime()).nsec;
+  range_.header.stamp.sec  = (world->SimTime()).sec;
+  range_.header.stamp.nsec = (world->SimTime()).nsec;
 
   // find ray with minimal range
   range_.range = std::numeric_limits<sensor_msgs::Range::_range_type>::max();
-  int num_ranges = sensor_->GetLaserShape()->GetSampleCount() * sensor_->GetLaserShape()->GetVerticalSampleCount();
+  int num_ranges = sensor_->LaserShape()->GetSampleCount() * sensor_->LaserShape()->GetVerticalSampleCount();
   for(int i = 0; i < num_ranges; ++i) 
   {
-    double ray = sensor_->GetLaserShape()->GetRange(i);
+    double ray = sensor_->LaserShape()->GetRange(i);
     if (ray < range_.range) range_.range = ray;
   }
 
